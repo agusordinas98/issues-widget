@@ -1,4 +1,11 @@
 function executeWidgetCode() {
+    // Confirmación inmediata de que el JS se cargó
+    const container = document.getElementById("issueInfo");
+    if (container) {
+        container.innerHTML = "<p style='color:blue;'>JS cargado correctamente desde GitHub Pages.</p>";
+    }
+    console.log("JS cargado correctamente desde GitHub Pages");
+
     var myWidget = {
         fetchIssue: async function (issueId, securityCtx) {
             try {
@@ -26,12 +33,11 @@ function executeWidgetCode() {
                 myWidget.displayIssue(issueData);
             } catch (error) {
                 console.error("Error obteniendo Issue:", error);
-                document.getElementById("issueInfo").innerHTML = "Error cargando Issue: " + error.message;
+                container.innerHTML += "<p style='color:red;'>Error cargando Issue: " + error.message + "</p>";
             }
         },
 
         displayIssue: function (issue) {
-            const container = document.getElementById("issueInfo");
             if (!container) return;
 
             // Mostrar JSON crudo para depuración
@@ -48,19 +54,25 @@ function executeWidgetCode() {
                 </table>
             `;
 
-            container.innerHTML = rawJson + table;
+            container.innerHTML += rawJson + table;
         },
 
         onLoadWidget: function () {
             const issueId = widget.getValue("issueId");
             const securityCtx = widget.getValue("securityCtx");
+
             console.log("Issue ID:", issueId);
             console.log("Security Context:", securityCtx);
+
+            container.innerHTML += `
+                <p>Issue ID leído: ${issueId || "(vacío)"}</p>
+                <p>Security Context leído: ${securityCtx || "(vacío)"}</p>
+            `;
 
             if (issueId) {
                 myWidget.fetchIssue(issueId, securityCtx);
             } else {
-                document.getElementById("issueInfo").innerHTML = "Configure un Physical ID en las preferencias.";
+                container.innerHTML += "<p style='color:orange;'>Configure un Physical ID en las preferencias.</p>";
             }
         }
     };
